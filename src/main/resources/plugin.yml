@@ -1,0 +1,9 @@
+name: twitch-event-bot-minecraft-plugin
+version: '1.0'
+main: lol.sven.twitchEventBotMinecraftPlugin.TwitchEventBotMinecraftPlugin
+api-version: '1.21'
+prefix: TTVEB
+load: STARTUP
+authors: [ Sven ]
+description: Template plugin for interacting with Twitch events
+website: sven.lol

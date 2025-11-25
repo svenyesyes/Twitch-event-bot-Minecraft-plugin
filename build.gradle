@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("com.gradleup.shadow") version "9.2.2"
+}
+
+group = 'lol.sven'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "spigotmc-repo"
+        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+    }
+}
+
+dependencies {
+    compileOnly("org.spigotmc:spigot-api:1.21.8-R0.1-SNAPSHOT")
+    implementation("com.github.twitch4j:twitch4j:1.25.0")
+}
+
+tasks {
+    runServer {
+        minecraftVersion("1.21.10")
+        dependsOn(tasks.shadowJar)
+
+        // Gebruik de shadow jar als plugin
+        pluginJars.from(tasks.shadowJar.archiveFile)
+    }
+
+    shadowJar {
+        archiveBaseName.set("TwitchPlugin")
+        archiveClassifier.set("")
+        archiveVersion.set("")
+
+        // RELLOCATE Twitch4J + Jackson + Feign + Hystrix
+        relocate("com.fasterxml", "lol.sven.shaded.jackson")
+        relocate("com.github.twitch4j", "lol.sven.shaded.twitch4j")
+        relocate("feign", "lol.sven.shaded.feign")
+        relocate("com.netflix.hystrix", "lol.sven.shaded.hystrix")
+    }
+}
+
+def targetJavaVersion = 21
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release.set(targetJavaVersion)
+    }
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
