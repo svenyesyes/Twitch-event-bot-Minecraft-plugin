@@ -25,7 +25,6 @@ tasks {
         minecraftVersion("1.21.10")
         dependsOn(tasks.shadowJar)
 
-        // Gebruik de shadow jar als plugin
         pluginJars.from(tasks.shadowJar.archiveFile)
     }
 
