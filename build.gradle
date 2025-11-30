@@ -17,7 +17,10 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.8-R0.1-SNAPSHOT")
-    implementation("com.github.twitch4j:twitch4j:1.25.0")
+    implementation("com.github.twitch4j:twitch4j:1.25.0") {
+        exclude group: "com.apollographql.apollo"
+        exclude group: "com.netflix.graphql.dgs"
+    }
 }
 
 tasks {
@@ -34,6 +37,9 @@ tasks {
         archiveVersion.set("")
 
         // RELLOCATE Twitch4J + Jackson + Feign + Hystrix
+        exclude 'com/apollographql/**'
+        exclude 'com/netflix/graphql/**'
+
         relocate("com.fasterxml", "lol.sven.shaded.jackson")
         relocate("com.github.twitch4j", "lol.sven.shaded.twitch4j")
         relocate("feign", "lol.sven.shaded.feign")
